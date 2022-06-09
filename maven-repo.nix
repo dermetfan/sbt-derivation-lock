@@ -2,7 +2,7 @@
   lib,
   runCommand,
   writeText,
-  lockFile, # deps.lock
+  lockFile, # path to deps.lock
 }: let
   lock = lib.importJSON lockFile;
 

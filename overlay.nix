@@ -26,8 +26,12 @@ self.inputs.nixpkgs.lib.composeManyExtensions [
                 --add-flags '-Dsbt.repository.config=${repoConfig} -Dsbt.override.build.repos=true'
             '';
           });
+
+          mkDerivation = prev.callPackage "${self.inputs.sbt-derivation}/pkgs/sbt-derivation" { inherit sbt; };
+          # inherit (prev.sbt) mkDerivation; # FIXME our custom mkDerivation doesn't work with lock-deps because it already needs to have a deps.lock
         in (
-          sbt.passthru.mkDerivation (args // {
+          mkDerivation (args // {
+            depsSha256 = null;
             depsWarmupCommand = ''
               ${args.depsWarmupCommand or ""}
               sbt "dependencyList ; consoleQuick" <<< ":quit"
@@ -40,12 +44,22 @@ self.inputs.nixpkgs.lib.composeManyExtensions [
           # explicitly overwrite the `postConfigure` phase, otherwise it
           # references the now null `deps` derivation.
           postConfigure = ''
+            ${args.postConfigure or ""}
             mkdir -p .nix/ivy
             # SBT expects a "local" prefix to each organization for plugins
             for repo in ${mavenRepo}/sbt-plugin-releases/*; do
               ln -s $repo .nix/ivy/local''${repo##*/}
             done
           '';
+
+          /*
+          preBuild = ''
+            echo ">>> PRE BUILD"
+            ${prev.which}/bin/which sbt
+
+            ${oldAttrs.preBuild or ""}
+          '';
+          */
 
           passthru = {
             inherit mavenRepo;
