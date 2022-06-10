@@ -1,10 +1,13 @@
 {
-  inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs;
-    sbt-derivation.url = github:zaninime/sbt-derivation;
-  };
+  inputs.sbt-derivation.url = github:zaninime/sbt-derivation;
 
-  outputs = { self, ... }: {
-    overlay = import ./overlay.nix self;
+  outputs = { sbt-derivation, ... }: {
+    overlay = final: prev: {
+      sbt = prev.sbt.overrideAttrs (oldAttrs: {
+        passthru = oldAttrs.passthru or {} // {
+          mkDerivation = prev.callPackage ./sbt-derivation.nix { inherit sbt-derivation; };
+        };
+      });
+    };
   };
 }
