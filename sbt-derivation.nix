@@ -2,11 +2,13 @@
   sbt-derivation,
   callPackage,
   sbt,
+
+  tree,
 }:
 
 {
   lockFile,
-  flakeOutput, # ? "defaultPackage"
+  flakeOutput,
   ...
 } @ args:
 
@@ -45,5 +47,7 @@ in
     for repo in ${lockedSbt.mavenRepo}/sbt-plugin-releases/*; do
       ln -s $repo .nix/ivy/local''${repo##*/}
     done
+
+    ${tree}/bin/tree .nix/ivy
   '';
 })
