@@ -3,13 +3,13 @@
   pkgs,
   lib,
   doCheck ? false,
-  sbt,
   flakeOutput,
 }:
 
 writeShellApplication {
   name = "lock-deps";
-  runtimeInputs = [sbt] ++ (with pkgs; [
+  runtimeInputs = with pkgs; [
+    sbt
     nix
     jq
     fd
@@ -22,11 +22,9 @@ writeShellApplication {
     gnutar
     zstd
     curl
-  ]);
+  ];
 
   text = ''
-    set -x
-
     REPO_DIR=$(git rev-parse --show-toplevel)
     LOCK_FILE="$REPO_DIR/deps.lock"
 
@@ -36,7 +34,9 @@ writeShellApplication {
     lock_hash=$(nix hash file "$LOCK_FILE")
   '' + ''
     #shellcheck disable=SC2016
-    nix develop -i "$REPO_DIR#${flakeOutput}.depsDerivation" --accept-flake-config -c -- bash -c 'eval "runHook () { :; }; ''${buildPhase:-buildPhase}"'
+    nix --experimental-features 'nix-command flakes' \
+      develop -i "$REPO_DIR#${flakeOutput}.depsDerivation" --accept-flake-config \
+      -c -- bash -c 'eval "runHook () { :; }; ''${buildPhase:-buildPhase}"'
 
     cd .nix/coursier-cache/https
     #shellcheck disable=SC2207
