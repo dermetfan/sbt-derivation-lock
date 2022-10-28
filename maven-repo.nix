@@ -8,7 +8,7 @@
 
   dependencies = writeText "sbt-dependencies" (
     builtins.concatStringsSep "\n"
-    (__mapAttrs (dep: "${dep.path}:${builtins.fetchurl dep.fetch}") lock)
+    (__attrValues (__mapAttrs (dep: "${dep.path}:${builtins.fetchurl dep.fetch}") lock))
   );
 in
   runCommand "maven-repo" {} ''
