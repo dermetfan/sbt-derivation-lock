@@ -12,7 +12,7 @@
 
 let
   lockedSbt = callPackage ./sbt.nix { inherit lockFile; };
-  callMkDerivation = callPackage "${sbt-derivation}/pkgs/sbt-derivation";
+  callMkDerivation = callPackage "${sbt-derivation}/lib/sbt-derivation.nix";
 in
 
 (callMkDerivation { sbt = lockedSbt; } (args // {
