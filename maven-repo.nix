@@ -12,6 +12,7 @@
   );
 in
   runCommand "maven-repo" {} ''
+    mkdir -p $out
     for pair in $(< ${dependencies}); do
       IFS=':' read path store <<< "$pair"
       path="''${path#*/*/}"
