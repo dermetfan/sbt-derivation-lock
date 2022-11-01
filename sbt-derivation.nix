@@ -38,8 +38,8 @@ in
 
   # explicitly overwrite the `postConfigure` phase, otherwise it
   # references the now null `deps` derivation.
-  postConfigure = ''
-    ${args.postConfigure or ""}
+  configurePhase = ''
+    ${args.configurePhase or ""}
     mkdir -p .nix/ivy
     # SBT expects a "local" prefix to each organization for plugins
     for repo in ${lockedSbt.mavenRepo}/sbt-plugin-releases/*; do
