@@ -48,18 +48,17 @@ in
     ${sbtEnvSetupCmds}
 
     # SBT expects a "local" prefix to each organization for plugins
-    for repo in ${lockedSbt.mavenRepo}/sbt-plugin-releases/*; do
-      ln -s $repo $SBT_DEPS/project/.ivy/local''${repo##*/}
-    done
+    #for repo in ${lockedSbt.mavenRepo}/sbt-plugin-releases/*; do
+    #  ln -s $repo $SBT_DEPS/project/.ivy/local''${repo##*/}
+    #done
   '';
 
   # explicitly overwrite the `configurePhase` phase, otherwise it
   # references the now null `deps` derivation.
   configurePhase = ''
-    ${args.configurePhase or ""}
     runHook preConfigure
 
-    ${oldAttrs.passthru.dependencies.extractor} $SBT_DEPS
+    #${oldAttrs.passthru.dependencies.extractor} $SBT_DEPS
 
     runHook postConfigure
   '';
